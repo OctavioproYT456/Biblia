@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Búsqueda de Versículos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        #resultado {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Búsqueda de Versículos</h1>
+        <select id="libro">
+            <option value="">Seleccione un libro</option>
+        </select>
+        <select id="capitulo" disabled>
+            <option value="">Seleccione un capítulo</option>
+        </select>
+        <select id="versiculo" disabled>
+            <option value="">Seleccione un versículo</option>
+        </select>
+        <div id="resultado"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const libroSelect = document.getElementById('libro');
+            const capituloSelect = document.getElementById('capitulo');
+            const versiculoSelect = document.getElementById('versiculo');
+            const resultadoDiv = document.getElementById('resultado');
+
+            // Función para realizar solicitudes POST
+            const realizarSolicitud = async (datos) => {
+                try {
+                    const respuesta = await fetch('/biblia.js', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(datos)
+                    });
+                    return await respuesta.json();
+                } catch (error) {
+                    return { error: 'Error al conectar con la API' };
+                }
+            };
+
+            // Cargar libros
+            realizarSolicitud({ libro: '', capitulo: '', versiculo: '' })
+                .then(data => {
+                    if (data.libros) {
+                        const libros = data.libros.split(', ');
+                        libros.forEach(libro => {
+                            const option = document.createElement('option');
+                            option.value = libro;
+                            option.textContent = libro.charAt(0).toUpperCase() + libro.slice(1);
+                            libroSelect.appendChild(option);
+                        });
+                    }
+                });
+
+            // Evento al seleccionar un libro
+            libroSelect.addEventListener('change', () => {
+                const libro = libroSelect.value;
+                capituloSelect.innerHTML = '<option value="">Seleccione un capítulo</option>';
+                versiculoSelect.innerHTML = '<option value="">Seleccione un versículo</option>';
+                capituloSelect.disabled = true;
+                versiculoSelect.disabled = true;
+                resultadoDiv.textContent = '';
+
+                if (libro) {
+                    realizarSolicitud({ libro, capitulo: '', versiculo: '' })
+                        .then(data => {
+                            if (data.capitulos) {
+                                const capitulos = data.capitulos.split(', ');
+                                capitulos.forEach(capitulo => {
+                                    const option = document.createElement('option');
+                                    option.value = capitulo;
+                                    option.textContent = `Capítulo ${capitulo}`;
+                                    capituloSelect.appendChild(option);
+                                });
+                                capituloSelect.disabled = false;
+                            }
+                        });
+                }
+            });
+
+            // Evento al seleccionar un capítulo
+            capituloSelect.addEventListener('change', () => {
+                const libro = libroSelect.value;
+                const capitulo = capituloSelect.value;
+                versiculoSelect.innerHTML = '<option value="">Seleccione un versículo</option>';
+                versiculoSelect.disabled = true;
+                resultadoDiv.textContent = '';
+
+                if (capitulo) {
+                    realizarSolicitud({ libro, capitulo, versiculo: '' })
+                        .then(data => {
+                            if (data.versiculos) {
+                                const versiculos = data.versiculos.split(', ');
+                                versiculos.forEach(versiculo => {
+                                    const option = document.createElement('option');
+                                    option.value = versiculo;
+                                    option.textContent = `Versículo ${versiculo}`;
+                                    versiculoSelect.appendChild(option);
+                                });
+                                versiculoSelect.disabled = false;
+                            }
+                        });
+                }
+            });
+
+            // Evento al seleccionar un versículo
+            versiculoSelect.addEventListener('change', () => {
+                const libro = libroSelect.value;
+                const capitulo = capituloSelect.value;
+                const versiculo = versiculoSelect.value;
+
+                if (versiculo) {
+                    realizarSolicitud({ libro, capitulo, versiculo })
+                        .then(data => {
+                            if (data.texto) {
+                                resultadoDiv.textContent = data.texto;
+                            } else if (data.error) {
+                                resultadoDiv.textContent = `Error: ${data.error}`;
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
