@@ -50,7 +50,7 @@
             // Función para realizar solicitudes POST
             const realizarSolicitud = async (datos) => {
                 try {
-                    const respuesta = await fetch('/biblia.js', {
+                    const respuesta = await fetch('http://194.164.125.5:6062/buscar', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(datos)
