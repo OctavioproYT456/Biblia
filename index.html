@@ -24,6 +24,10 @@
             font-size: 18px;
             font-weight: bold;
         }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -39,6 +43,7 @@
             <option value="">Seleccione un versículo</option>
         </select>
         <div id="resultado"></div>
+        <div id="error" class="error"></div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -46,6 +51,7 @@
             const capituloSelect = document.getElementById('capitulo');
             const versiculoSelect = document.getElementById('versiculo');
             const resultadoDiv = document.getElementById('resultado');
+            const errorDiv = document.getElementById('error');
             const API_URL = 'http://194.164.125.5:6062/buscar';
 
             // Función para realizar solicitudes POST
@@ -56,25 +62,43 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(datos)
                     });
+                    if (!respuesta.ok) {
+                        throw new Error(`HTTP ${respuesta.status}: ${respuesta.statusText}`);
+                    }
                     return await respuesta.json();
                 } catch (error) {
-                    return { error: 'Error al conectar con la API' };
+                    return { error: `Error de conexión: ${error.message}` };
                 }
             };
 
             // Cargar libros al iniciar
-            realizarSolicitud({ libro: '', capitulo: '', versiculo: '' })
-                .then(data => {
-                    if (data.libros) {
-                        const libros = data.libros.split(', ');
-                        libros.forEach(libro => {
-                            const option = document.createElement('option');
-                            option.value = libro;
-                            option.textContent = libro.charAt(0).toUpperCase() + libro.slice(1);
-                            libroSelect.appendChild(option);
-                        });
-                    }
-                });
+            const cargarLibros = () => {
+                realizarSolicitud({ libro: '', capitulo: '', versiculo: '' })
+                    .then(data => {
+                        if (data.libros) {
+                            const libros = data.libros.split(', ');
+                            libros.forEach(libro => {
+                                const option = document.createElement('option');
+                                option.value = libro;
+                                option.textContent = libro.charAt(0).toUpperCase() + libro.slice(1);
+                                libroSelect.appendChild(option);
+                            });
+                        } else if (data.error) {
+                            mostrarError(data.error);
+                        }
+                    });
+            };
+
+            // Mostrar mensajes de error
+            const mostrarError = (mensaje) => {
+                errorDiv.textContent = mensaje;
+                resultadoDiv.textContent = '';
+            };
+
+            // Limpiar mensajes de error
+            const limpiarError = () => {
+                errorDiv.textContent = '';
+            };
 
             // Evento al seleccionar un libro
             libroSelect.addEventListener('change', () => {
@@ -84,6 +108,7 @@
                 capituloSelect.disabled = true;
                 versiculoSelect.disabled = true;
                 resultadoDiv.textContent = '';
+                limpiarError();
 
                 if (libro) {
                     realizarSolicitud({ libro, capitulo: '', versiculo: '' })
@@ -97,6 +122,8 @@
                                     capituloSelect.appendChild(option);
                                 });
                                 capituloSelect.disabled = false;
+                            } else if (data.error) {
+                                mostrarError(data.error);
                             }
                         });
                 }
@@ -109,6 +136,7 @@
                 versiculoSelect.innerHTML = '<option value="">Seleccione un versículo</option>';
                 versiculoSelect.disabled = true;
                 resultadoDiv.textContent = '';
+                limpiarError();
 
                 if (capitulo) {
                     realizarSolicitud({ libro, capitulo, versiculo: '' })
@@ -122,6 +150,8 @@
                                     versiculoSelect.appendChild(option);
                                 });
                                 versiculoSelect.disabled = false;
+                            } else if (data.error) {
+                                mostrarError(data.error);
                             }
                         });
                 }
@@ -132,6 +162,7 @@
                 const libro = libroSelect.value;
                 const capitulo = capituloSelect.value;
                 const versiculo = versiculoSelect.value;
+                limpiarError();
 
                 if (versiculo) {
                     realizarSolicitud({ libro, capitulo, versiculo })
@@ -139,11 +170,14 @@
                             if (data.texto) {
                                 resultadoDiv.textContent = data.texto;
                             } else if (data.error) {
-                                resultadoDiv.textContent = `Error: ${data.error}`;
+                                mostrarError(data.error);
                             }
                         });
                 }
             });
+
+            // Cargar libros al iniciar
+            cargarLibros();
         });
     </script>
 </body>
