@@ -1,0 +1,3754 @@
+<html><head><base href=".">
+<meta charset="utf-8">
+<title>WebTube Multiplayer</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background: #0f0f0f;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+body.light-mode {
+  background: #ffffff;
+  color: #0f0f0f;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  margin-left: 220px !important;
+  height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background: #202020;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background 0.3s ease;
+  margin-top: 40px;
+}
+
+.light-mode .header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.logo {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(45deg, #4285f4, #ea4335);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.light-mode .logo {
+  background: linear-gradient(45deg, #4285f4, #ea4335);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo svg {
+  fill: url(#logo-gradient);
+  margin-right: 5px;
+}
+
+.search-bar {
+  flex: 1;
+  display: flex;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 8px 15px;
+  border: 1px solid #303030;
+  background: #121212;
+  color: white;
+  border-radius: 20px 0 0 20px;
+}
+
+.light-mode .search-bar input {
+  background: #f8f8f8;
+  border: 1px solid #e5e5e5;
+  color: #0f0f0f;
+}
+
+.search-bar button {
+  padding: 8px 20px;
+  background: #303030;
+  border: none;
+  border-radius: 0 20px 20px 0;
+  color: white;
+  cursor: pointer;
+}
+
+.light-mode .search-bar button {
+  background: #f0f0f0;
+  color: #0f0f0f;
+}
+
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  justify-items: center;
+}
+
+.profile-menu {
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.create-button {
+  margin-right: 20px;
+  padding: 8px 16px;
+  background: #303030;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.light-mode .create-button {
+  background: #f0f0f0;
+  color: #0f0f0f;
+}
+
+.create-button:hover {
+  background: #404040;
+}
+
+.light-mode .create-button:hover {
+  background: #e5e5e5;
+}
+
+.profile-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #303030;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.profile-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #202020;
+  border-radius: 8px;
+  padding: 8px 0;
+  margin-top: 8px;
+  min-width: 200px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+.light-mode .profile-menu-dropdown {
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.menu-item {
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+}
+
+.light-mode .menu-item {
+  color: #0f0f0f;
+}
+
+.menu-item:hover {
+  background: #303030;
+}
+
+.light-mode .menu-item:hover {
+  background: #f5f5f5;
+}
+
+.menu-item svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  margin-right: 12px;
+}
+
+.menu-item svg[viewBox="0 0 24 24"] {
+  width: 24px;
+  height: 24px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-upload-container {
+  border: 2px dashed #404040;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+.light-mode .file-upload-container {
+  border-color: #e5e5e5;
+}
+
+.file-upload-container:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.light-mode .file-upload-container:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #202020;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  color: white;
+}
+
+.light-mode .modal-content {
+  background: #ffffff;
+  color: #0f0f0f;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.modal-form::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-form::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.modal-form::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+} 
+
+.light-mode .modal-form::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .modal-form::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.modal-form input[type="text"],
+.modal-form textarea {
+  padding: 8px;
+  border: 1px solid #404040;
+  background: #303030;
+  color: white;
+  border-radius: 4px;
+}
+
+.light-mode .modal-form input[type="text"],
+.light-mode .modal-form textarea {
+  background: #f8f8f8;
+  border: 1px solid #e5e5e5;
+  color: #0f0f0f;
+}
+
+.modal-form input[type="file"] {
+  display: none;
+}
+
+.thumbnail-preview {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  margin: 10px 0;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-button {
+  background: #1a73e8 !important;
+  color: white;
+  border-radius: 20px !important;
+}
+
+.submit-button:hover {
+  background: #1557b0 !important;
+}
+
+.cancel-button {
+  background: #303030;
+  color: white;
+}
+
+.light-mode .cancel-button {
+  background: #f0f0f0;
+  color: #0f0f0f;
+}
+
+.modal-form button[type="button"] {
+  background: #065fd4;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.modal-form button[type="button"]:hover {
+  background: #0356c5;
+}
+
+.light-mode .modal-form button[type="button"] {
+  background: #1a73e8;
+}
+
+.light-mode .modal-form button[type="button"]:hover {
+  background: #1557b0;
+}
+
+.video-card {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  background: #202020;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.light-mode .video-card {
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.video-card:hover {
+  transform: scale(1.02);
+}
+
+.video-thumbnail {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  background: #000;
+}
+
+.video-info {
+  padding: 12px;
+}
+
+.video-title {
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.video-metadata {
+  font-size: 14px;
+  color: #aaa;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.light-mode .video-metadata {
+  color: #606060;
+}
+
+.video-username {
+  font-weight: 500;
+}
+
+.video-stats {
+  font-size: 12px;
+}
+
+.video-hashtags {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hashtag {
+  color: #065fd4; 
+  font-size: 0.9em;
+}
+
+.light-mode .hashtag {
+  color: #1a73e8;
+}
+
+.modal-form input[type="text"].hashtag-input {
+  font-family: monospace;
+}
+
+.video-fullscreen-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 2000;
+  padding-top: 10px;
+}
+
+.video-content-container {
+  width: 75%;
+  padding: 20px 24px;
+  box-sizing: border-box;
+}
+
+.video-fullscreen-container {
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  position: relative;
+  background: none; /* Remove black background */
+  margin-top: 20px;
+}
+
+.video-fullscreen-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.video-fullscreen-info {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 20px;
+}
+
+.video-details {
+  padding-top: 16px;
+  width: 100%;
+}
+
+.video-stats {
+  color: #aaa;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.video-description {
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.video-actions {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.action-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.light-mode .action-button {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.light-mode .action-button:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.action-button.liked {
+  color: #065fd4;
+  background: rgba(6, 95, 212, 0.1);
+}
+
+.light-mode .action-button.liked {
+  color: #065fd4;
+  background: rgba(6, 95, 212, 0.1); 
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.action-button svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.back-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2002;
+}
+
+.light-mode .back-button {
+  background: rgba(0, 0, 0, 0.1);
+  color: #0f0f0f;
+}
+
+.recommended-videos {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 25%;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px;
+  background: #0f0f0f;
+  border-left: 1px solid #303030;
+}
+
+.light-mode .recommended-videos {
+  background: #ffffff;
+  border-left: 1px solid #e5e5e5;
+}
+
+.recommended-videos h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.light-mode .recommended-videos h2 {
+  color: #0f0f0f;
+}
+
+.recommended-video-card {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.recommended-thumbnail {
+  width: 168px;
+  height: 94px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: #000;
+}
+
+.recommended-info {
+  flex: 1;
+}
+
+.recommended-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.recommended-metadata {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.light-mode .recommended-metadata {
+  color: #606060;
+}
+
+.video-fullscreen-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.video-fullscreen-metadata {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
+.light-mode .video-fullscreen-metadata {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.video-channel-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.channel-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.channel-details {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.channel-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.subscribe-button {
+  background-color: #cc0000;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.subscribe-button.subscribed {
+  background-color: #303030;
+  border-radius: 20px;
+}
+
+.subscribe-button:hover {
+  background-color: #990000;
+}
+
+.subscribe-button.subscribed:hover {
+  background-color: #404040;
+}
+
+.video-fullscreen-info {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 20px;
+}
+
+.profile-page {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  color: white;
+}
+
+.light-mode .profile-page {
+  color: #0f0f0f;
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  margin-bottom: 48px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.light-mode .profile-header {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h1 {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.light-mode .stat-label {
+  color: #606060;
+}
+
+.profile-join-date {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.light-mode .profile-join-date {
+  color: #606060;
+}
+
+.profile-videos h2 {
+  margin-bottom: 24px;
+  font-size: 24px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.light-mode ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.light-mode ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.comments-section {
+  margin-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px 0;
+  width: 75%; /* Match video content width */
+}
+
+.light-mode .comments-section {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.comments-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.comments-count {
+  color: #aaa;
+  font-size: 14px;
+}
+
+.light-mode .comments-count {
+  color: #606060;
+}
+
+.comment-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #303030;
+  background: #121212;
+  border-radius: 4px;
+  color: white;
+  resize: none;
+}
+
+.light-mode .comment-input {
+  background: #f8f8f8;
+  border: 1px solid #e5e5e5;
+  color: #0f0f0f;
+}
+
+.comment-submit {
+  padding: 8px 16px;
+  background: #065fd4;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.comment-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.comment {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.comment-username {
+  font-weight: 500;
+}
+
+.comment-time {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.light-mode .comment-time {
+  color: #606060;
+}
+
+.comment-text {
+  margin-bottom: 8px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 8px;
+  color: #aaa;
+}
+
+.light-mode .comment-actions {
+  color: #606060;
+}
+
+.comment-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.comment-action:hover {
+  color: white;
+}
+
+.light-mode .comment-action:hover {
+  color: #0f0f0f;
+}
+
+.delete-comment-button {
+  background: none;
+  border: none;
+  color: #cc0000;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.delete-comment-button:hover {
+  background: rgba(204, 0, 0, 0.1);
+}
+
+.delete-comment-button.edit-button {
+  color: #1a73e8;
+  background: rgba(26, 115, 232, 0.1);
+}
+
+.delete-comment-button.edit-button svg {
+  fill: #1a73e8;
+}
+
+.delete-comment-button.edit-button:hover {
+  background: rgba(26, 115, 232, 0.2);
+}
+
+.comment-reply-button {
+  color: #065fd4; 
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;  
+  margin-left: 8px;
+}
+
+.comment-reply-form {
+  margin-left: 56px;
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+}
+
+.comment-replies {
+  margin-left: 56px;
+  margin-top: 8px;
+}
+
+.reply {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+}
+
+.reply .comment-avatar {
+  width: 24px;
+  height: 24px;
+}
+
+.comment-action.reply-action {
+  font-size: 12px;
+}
+
+.reply .comment-actions {
+  font-size: 12px;
+}
+
+.reply-count {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+.light-mode .reply-count {
+  color: #606060;
+}
+
+.reply-count:hover {
+  color: white;
+}
+
+.light-mode .reply-count:hover {
+  color: #0f0f0f;
+}
+
+.no-results {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+  color: #aaa;
+}
+
+.edit-video-button {
+  background: #1a73e8;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.edit-video-button:hover {
+  background: #1557b0;
+}
+
+.light-mode .edit-video-button {
+  background: #1a73e8;
+  color: white;
+}
+
+.add-to-playlist-button {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  display: flex;
+  align-items: center; 
+  gap: 4px;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.light-mode .add-to-playlist-button {
+  color: #606060;
+}
+
+.add-to-playlist-button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.light-mode .add-to-playlist-button:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+.playlist-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.playlist-modal-content {
+  background: #202020;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  color: white;
+}
+
+.light-mode .playlist-modal-content {
+  background: #ffffff;
+  color: #0f0f0f;
+}
+
+.playlist-list {
+  margin: 20px 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.playlist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.playlist-delete-button {
+  background: none;
+  border: none;
+  color: #cc0000;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.playlist-delete-button:hover {
+  background: rgba(204, 0, 0, 0.1);
+}
+
+.playlist-back-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2002;
+}
+
+.light-mode .playlist-back-button {
+  background: rgba(0, 0, 0, 0.1);
+  color: #0f0f0f;
+}
+
+.new-playlist-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.new-playlist-form input {
+  flex: 1;
+  padding: 8px;
+  background: #303030;
+  border: 1px solid #404040;
+  color: white;
+  border-radius: 4px;
+}
+
+.light-mode .new-playlist-form input {
+  background: #f8f8f8;
+  border: 1px solid #e5e5e5;
+  color: #0f0f0f;
+}
+
+.channel-name:hover, .video-username:hover {
+  color: #4285f4;
+  text-decoration: underline;
+}
+
+.chat-container {
+  background: #202020;
+  color: white;
+  height: calc(100vh - 40px); 
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.light-mode .chat-container {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.chat-input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+}
+
+.light-mode .chat-input-container {
+  border-top: 1px solid rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.05);
+}
+
+.chat-input-container form {
+  flex: 1;
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-container input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 20px;
+  border: 1px solid #303030;
+  background: #121212;
+  color: white;
+  font-size: 14px;
+}
+
+.light-mode .chat-input-container input {
+  background: #f8f8f8;
+  border: 1px solid #e5e5e5;
+  color: #0f0f0f;
+}
+
+.chat-input-container button {
+  padding: 10px 24px;
+  border-radius: 20px;
+  border: none;
+  background: #1a73e8;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.chat-input-container button:hover {
+  background: #1557b0;
+}
+
+.chat-image {
+  width: 300px;
+  height: 300px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-top: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.light-mode .chat-image {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.chat-message {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  word-break: break-word;
+}
+
+.chat-message img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.message-content {
+  flex: 1;
+}
+
+.message-header {
+  margin-bottom: 4px;
+}
+
+.message-username {
+  font-weight: 500;
+  color: #1a73e8;
+  cursor: pointer; 
+  text-decoration: underline; 
+}
+
+.message-time {
+  font-size: 12px;
+  color: #aaa;
+  margin-left: 8px;
+}
+
+.light-mode .message-time {
+  color: #606060;
+}
+
+.image-upload-button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-upload-button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.light-mode .image-upload-button:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+.owner-tag {
+  background: linear-gradient(45deg, #4285f4, #ea4335);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.message-input-error {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.back-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2002;
+}
+
+.light-mode .back-button {
+  background: rgba(0, 0, 0, 0.1);
+  color: #0f0f0f;
+}
+
+.discord-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #5865F2;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  font-size: 16px;
+  z-index: 2003;
+  font-weight: 500;
+}
+
+.discord-banner a {
+  color: white;
+  text-decoration: underline;
+}
+
+.video-stats-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.light-mode .video-stats-icons {
+  color: #606060;
+}
+
+.stats-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stats-item svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.slideshow-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: none; 
+}
+
+.slideshow-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.slideshow-nav {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.slideshow-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+}
+
+.slideshow-dot.active {
+  background: white;
+}
+
+.slideshow-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  padding: 16px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.slideshow-arrow.prev {
+  left: 20px;
+}
+
+.slideshow-arrow.next {
+  right: 20px;
+}
+
+.image-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.image-upload-preview {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.simple-ui .video-card {
+  padding: 10px;
+  height: auto;
+  min-height: 0;
+  background: none;
+}
+
+.simple-ui .video-info {
+  padding: 0;
+}
+
+.simple-ui .video-title {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.simple-ui .video-stats-icons {
+  display: flex;
+  gap: 16px;
+}
+
+.envelope-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #aaa;
+  padding: 4px;
+  margin-left: 8px;
+}
+
+.envelope-icon:hover {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.light-mode .envelope-icon:hover {
+  background: rgba(0,0,0,0.1);
+  color: #0f0f0f;
+}
+
+.dm-list {
+  padding: 20px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.dm-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.dm-user:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.light-mode .dm-user:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+.dm-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.dm-username {
+  font-weight: 500;
+}
+
+.no-users {
+  text-align: center;
+  color: #aaa;
+  font-style: italic;
+  padding: 20px;
+}
+
+.light-mode .no-users {
+  color: #606060;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 40px;
+  width: 200px;
+  height: 100vh;
+  background: #202020;
+  padding: 20px;
+  padding-top: 60px;
+  z-index: 99;
+}
+
+.light-mode .sidebar {
+  background: #ffffff;
+  border-right: 1px solid #e5e5e5;
+}
+
+.sorting-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.sorting-button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.light-mode .sorting-button:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+.sorting-button.active {
+  background: rgba(255,255,255,0.2);
+}
+
+.light-mode .sorting-button.active {
+  background: rgba(0,0,0,0.2);
+}
+
+.sorting-button svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.no-subscriptions {
+  color: #aaa;
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+}
+
+.light-mode .no-subscriptions {
+  color: #606060;
+}
+
+.no-events {
+  color: #aaa;
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+}
+
+.light-mode .no-events {
+  color: #606060;
+}
+
+.chat-menu {
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.light-mode .chat-menu {
+  border-bottom: 1px solid rgba(0,0,0,0.1); 
+}
+
+.chat-menu-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.chat-menu-button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.light-mode .chat-menu-button:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+.chat-menu-button.active {
+  background: rgba(255,255,255,0.2);
+}
+
+.light-mode .chat-menu-button.active {
+  background: rgba(0,0,0,0.2);
+}
+
+.content-warning {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  z-index: 1; 
+}
+
+.content-warning button {
+  margin-top: 20px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #cc0000;
+  color: white;
+  cursor: pointer;
+}
+
+.content-warning button:hover {
+  background: #990000;
+}
+
+.upload-progress {
+  display: inline-block;
+  margin-left: 8px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top-color: #1a73e8;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<input id="video-upload-input" type="file" accept="video/*" onchange="{handleVideoChange}" style="display:none;">
+<script type="text/babel">const VIDEO_POST_LIMIT = 6;
+const VIDEO_POST_COOLDOWN = 10 * 60 * 1000;
+const {
+  useState,
+  useRef,
+  useEffect
+} = React;
+const room = new WebsimSocket();
+function formatRelativeTime(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
+  const diffInWeeks = Math.floor(diffInDays / 7);
+  const diffInMonths = Math.floor(diffInDays / 30);
+  const diffInYears = Math.floor(diffInDays / 365);
+  if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+  if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+  if (diffInHours < 24) return `${diffInHours} hours ago`;
+  if (diffInDays < 7) return `${diffInDays} days ago`;
+  if (diffInWeeks < 4) return `${diffInWeeks} weeks ago`;
+  if (diffInMonths < 12) return `${diffInMonths} months ago`;
+  return `${diffInYears} years ago`;
+}
+function VideoFullscreen({
+  video,
+  onClose,
+  setSelectedVideo,
+  setViewingProfile,
+  handleHashtagClick
+}) {
+  const [likes, setLikes] = useState(video.likes || 0);
+  const [dislikes, setDislikes] = useState(video.dislikes || 0);
+  const [userLiked, setUserLiked] = useState(false);
+  const [userDisliked, setUserDisliked] = useState(false);
+  const [likeButtonDisabled, setLikeButtonDisabled] = useState(false);
+  const [dislikeButtonDisabled, setDislikeButtonDisabled] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [allSubscriptions, setAllSubscriptions] = useState({});
+  const [allUserLikes, setAllUserLikes] = useState({});
+  const [showDeleteButton, setShowDeleteButton] = useState(false);
+  const [recommendedVideos, setRecommendedVideos] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState('');
+  const [commentCount, setCommentCount] = useState(0);
+  const [userViews, setUserViews] = useState(() => {
+    const savedViews = localStorage.getItem('userVideoViews');
+    return savedViews ? JSON.parse(savedViews) : {};
+  });
+  const [showEdit, setShowEdit] = useState(false);
+  const [showPlaylistModal, setShowPlaylistModal] = useState(false);
+  useEffect(() => {
+    const currentViews = userViews[video.id] || 0;
+    if (currentViews < 5) {
+      const newViews = {
+        ...userViews,
+        [video.id]: currentViews + 1
+      };
+      setUserViews(newViews);
+      localStorage.setItem('userVideoViews', JSON.stringify(newViews));
+      room.collection('videos').update(video.id, {
+        views: (video.views || 0) + 1
+      }).catch(error => {
+        console.error('Error updating views:', error);
+      });
+    }
+  }, [video.id]);
+  useEffect(() => {
+    setLikes(video.likes || 0);
+    setDislikes(video.dislikes || 0);
+    const unsubscribe = room.collection('videos').filter({
+      id: video.id
+    }).subscribe(videos => {
+      if (videos.length > 0) {
+        setLikes(videos[0].likes || 0);
+        setDislikes(videos[0].dislikes || 0);
+      }
+    });
+    const likesUnsubscribe = room.collection('userLikes').filter({
+      username: room.party.client.username,
+      videoId: video.id
+    }).subscribe(likes => {
+      setUserLiked(likes.length > 0);
+    });
+    return () => {
+      unsubscribe();
+      likesUnsubscribe();
+    };
+  }, [video.id, video.likes, video.dislikes]);
+  useEffect(() => {
+    const subscriptionsUnsubscribe = room.collection('subscriptions').filter({
+      subscriber: room.party.client.username
+    }).subscribe(subscriptions => {
+      const userSubs = {};
+      subscriptions.forEach(sub => {
+        userSubs[sub.channel] = true;
+      });
+      setAllSubscriptions(userSubs);
+      setIsSubscribed(!!userSubs[video.username]);
+    });
+    return () => subscriptionsUnsubscribe();
+  }, [video.username]);
+  useEffect(() => {
+    const unsubscribe = room.collection('videos').subscribe(allVideos => {
+      const filtered = allVideos.filter(v => v.id !== video.id).sort(() => Math.random() - 0.5).slice(0, 15);
+      setRecommendedVideos(filtered);
+    });
+    return () => unsubscribe();
+  }, [video.id]);
+  useEffect(() => {
+    setShowDeleteButton(video.username === room.party.client.username || room.party.client.username === 'Ai_guy');
+  }, [video.username]);
+  useEffect(() => {
+    const unsubscribe = room.collection('comments').filter({
+      videoId: video.id
+    }).subscribe(newComments => {
+      setComments(newComments);
+      const replyUnsubscribe = room.collection('replies').subscribe(replies => {
+        const videoReplies = replies.filter(reply => newComments.some(comment => comment.id === reply.parentCommentId));
+        setCommentCount(newComments.length + videoReplies.length);
+      });
+      return () => {
+        replyUnsubscribe();
+      };
+    });
+    return () => unsubscribe();
+  }, [video.id]);
+  const handleLike = async () => {
+    if (userDisliked || likeButtonDisabled) return;
+    setLikeButtonDisabled(true);
+    setTimeout(() => {
+      setLikeButtonDisabled(false);
+    }, 2000);
+    try {
+      const currentLikes = likes;
+      if (userLiked) {
+        await room.collection('videos').update(video.id, {
+          likes: Math.max(0, currentLikes - 1)
+        });
+        const userLikesList = await room.collection('userLikes').filter({
+          username: room.party.client.username,
+          videoId: video.id
+        }).getList();
+        if (userLikesList.length > 0) {
+          await room.collection('userLikes').delete(userLikesList[0].id);
+        }
+        setUserLiked(false);
+        setLikes(Math.max(0, currentLikes - 1));
+      } else {
+        await room.collection('videos').update(video.id, {
+          likes: currentLikes + 1
+        });
+        await room.collection('userLikes').create({
+          username: room.party.client.username,
+          videoId: video.id
+        });
+        setUserLiked(true);
+        setLikes(currentLikes + 1);
+      }
+    } catch (error) {
+      console.error('Error updating like:', error);
+    }
+  };
+  const handleDislike = async () => {
+    if (userLiked || dislikeButtonDisabled) return;
+    setDislikeButtonDisabled(true);
+    setTimeout(() => {
+      setDislikeButtonDisabled(false);
+    }, 2000);
+    const currentDislikes = dislikes;
+    if (userDisliked) {
+      await room.collection('videos').update(video.id, {
+        dislikes: Math.max(0, currentDislikes - 1)
+      });
+      setUserDisliked(false);
+      setDislikes(Math.max(0, currentDislikes - 1));
+    } else {
+      await room.collection('videos').update(video.id, {
+        dislikes: currentDislikes + 1
+      });
+      setUserDisliked(true);
+      setDislikes(currentDislikes + 1);
+    }
+  };
+  const handleSubscribe = async () => {
+    if (isSubscribed) {
+      const subsList = await room.collection('subscriptions').filter({
+        subscriber: room.party.client.username,
+        channel: video.username
+      }).getList();
+      if (subsList.length > 0) {
+        await room.collection('subscriptions').delete(subsList[0].id);
+      }
+      setIsSubscribed(false);
+    } else {
+      await room.collection('subscriptions').create({
+        subscriber: room.party.client.username,
+        channel: video.username
+      });
+      setIsSubscribed(true);
+    }
+  };
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this video? This cannot be undone.')) {
+      try {
+        await room.collection('videos').delete(video.id);
+        onClose();
+      } catch (error) {
+        console.error('Error deleting video:', error);
+      }
+    }
+  };
+  const handleCommentSubmit = async e => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    try {
+      await room.collection('comments').create({
+        videoId: video.id,
+        text: commentText,
+        username: room.party.client.username,
+        likes: 0,
+        dislikes: 0
+      });
+      setCommentText('');
+    } catch (error) {
+      console.error('Error posting comment:', error);
+    }
+  };
+  const formatDate = dateString => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+  const formatRelativeTime = dateString => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    if (seconds < 60) return `${seconds} seconds ago`;
+    if (minutes < 60) return `${minutes} minutes ago`;
+    if (hours < 24) return `${hours} hours ago`;
+    if (days < 365) return `${days} days ago`;
+    return `${Math.floor(days / 365)} years ago`;
+  };
+  return <div className="video-fullscreen-modal">
+      <div className="discord-banner">
+        Join our Discord to keep up and suggest new features! <a href="https://discord.gg/ZxxYAmCU" target="_blank">Join Now</a>
+      </div>
+      <button className="back-button" onClick={onClose}>
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+        </svg>
+        Back
+      </button>
+      <div className="video-content-container">
+        <div className="video-fullscreen-container">
+          {video.isSlideshow ? <Slideshow images={video.slideshowImages} /> : <video controls autoPlay src={video.videoUrl} style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover'
+        }} onError={e => {
+          console.error('Video playback error:', e);
+          alert('Error playing video. The format may not be supported by your browser.');
+        }} />}
+        </div>
+        <div className="video-fullscreen-info">
+          <h1 className="video-fullscreen-title">{video.title}</h1>
+          <div className="video-fullscreen-metadata">
+            <div className="video-channel-info">
+              <img src={`https://images.websim.ai/avatar/${video.username}`} alt={video.username} className="channel-avatar" />
+              <div className="channel-details">
+                <span className="channel-name" onClick={e => {
+                e.stopPropagation();
+                onClose();
+                setViewingProfile(video.username);
+              }} style={{
+                cursor: 'pointer'
+              }}>
+                  {video.username}
+                  {video.username === 'Ai_guy' && <span className="owner-tag">Owner</span>}
+                </span>
+                <button className={`subscribe-button ${isSubscribed ? 'subscribed' : ''}`} onClick={handleSubscribe}>
+                  {isSubscribed ? 'Subscribed' : 'Subscribe'}
+                </button>
+              </div>
+            </div>
+            <div className="video-actions">
+              <button className="action-button" onClick={handleLike} style={{
+              color: userLiked ? '#4285f4' : 'white'
+            }} disabled={likeButtonDisabled}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41.17-.79.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+                </svg>
+                {likes}
+              </button>
+              <button className="action-button" onClick={handleDislike} style={{
+              color: userDisliked ? '#4285f4' : 'inherit'
+            }} disabled={dislikeButtonDisabled}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.58-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
+                </svg>
+                {dislikes}
+              </button>
+              <button className="add-to-playlist-button action-button" onClick={() => setShowPlaylistModal(true)}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+                Add to Playlist
+              </button>
+
+              {showDeleteButton && <>
+                <button className="edit-video-button" onClick={() => setShowEdit(true)}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                  </svg>
+                  Edit
+                </button>
+                <button className="action-button delete-button" onClick={handleDelete} style={{
+                background: '#cc0000'
+              }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 19c0 1.1-.9 2-2 2h-6.31l.95-4.57.03-.32c0-.41.17-.79.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+                  </svg>
+                  Delete
+                </button>
+              </>}
+            </div>
+          </div>
+          <div className="video-details">
+            <div className="video-stats">
+              {video.views || 0} views • {formatDate(video.created_at)}
+            </div>
+            <div className="video-description">
+              {video.description || 'No description available.'}
+              {video.hashtags && video.hashtags.length > 0 && <div style={{
+              marginTop: '10px'
+            }}>
+                  {video.hashtags.map(tag => <span key={tag} className="hashtag" onClick={e => {
+                e.stopPropagation();
+                handleHashtagClick(tag);
+                onClose();
+              }} style={{
+                cursor: 'pointer',
+                marginRight: '8px'
+              }}>
+                      {tag}
+                    </span>)}
+                </div>}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="recommended-videos">
+        <h2>Recommended videos</h2>
+        {recommendedVideos.map(recVideo => <div key={recVideo.id} className="recommended-video-card" onClick={() => {
+        onClose();
+        setSelectedVideo(recVideo);
+      }}>
+            <img src={recVideo.thumbnailUrl || `https://images.websim.ai/avatar/${recVideo.username}`} alt={recVideo.title} className="recommended-thumbnail" />
+            <div className="recommended-info">
+              <div className="recommended-title">{recVideo.title}</div>
+              <div className="recommended-metadata">
+                <div>{recVideo.username}</div>
+                <div>{recVideo.views || 0} views • {formatRelativeTime(recVideo.created_at)}</div>
+              </div>
+            </div>
+          </div>)}
+      </div>
+      <div className="comments-section">
+        <div className="comments-header">
+          <h3>Comments</h3>
+          <span className="comments-count">{commentCount}</span>
+        </div>
+        <form className="comment-form" onSubmit={handleCommentSubmit}>
+          <img src={`https://images.websim.ai/avatar/${room.party.client.username}`} alt="Your avatar" className="comment-avatar" />
+          <textarea className="comment-input" placeholder="Add a comment..." value={commentText} onChange={e => setCommentText(e.target.value)} rows={1} />
+          <button className="comment-submit" type="submit" disabled={!commentText.trim()}>
+            Comment
+          </button>
+        </form>
+        {comments.map(comment => <Comment key={comment.id} comment={comment} />)}
+      </div>
+      {showEdit && <EditVideoModal video={video} onClose={() => setShowEdit(false)} />}
+      {showPlaylistModal && <AddToPlaylistModal video={video} onClose={() => setShowPlaylistModal(false)} />}
+    </div>;
+}
+function ProfilePage({
+  username,
+  onClose
+}) {
+  const [userVideos, setUserVideos] = useState([]);
+  const [subscribers, setSubscribers] = useState(0);
+  const [joinDate, setJoinDate] = useState('');
+  const [totalViews, setTotalViews] = useState(0);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  useEffect(() => {
+    const subsUnsubscribe = room.collection('subscriptions').filter({
+      channel: username
+    }).subscribe(subs => {
+      setSubscribers(subs.length);
+    });
+    return () => subsUnsubscribe();
+  }, [username]);
+  useEffect(() => {
+    const unsubscribe = room.collection('videos').filter({
+      username: username
+    }).subscribe(videos => {
+      setUserVideos(videos);
+      const views = videos.reduce((total, video) => total + (video.views || 0), 0);
+      setTotalViews(views);
+    });
+    room.collection('videos').filter({
+      username: username
+    }).subscribe(videos => {
+      if (videos.length > 0) {
+        const sortedVideos = [...videos].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        setJoinDate(sortedVideos[0].created_at);
+      }
+    });
+    return () => unsubscribe();
+  }, [username]);
+  const formatDate = dateString => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+  return <div className="profile-page">
+      <div className="discord-banner">
+        Join our Discord to keep up and suggest new features! <a href="https://discord.gg/ZxxYAmCU" target="_blank">Join Now</a>
+      </div>
+      <button className="back-button" onClick={onClose}>
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+        </svg>
+        Back
+      </button>
+      
+      <div className="profile-header">
+        <img src={`https://images.websim.ai/avatar/${username}`} alt={username} className="profile-avatar" />
+        <div className="profile-info">
+          <h1>
+            {username}
+            {username === 'Ai_guy' && <span className="owner-tag">Owner</span>}
+          </h1>
+          <div className="profile-stats">
+            <div className="stat">
+              <span className="stat-value">{subscribers}</span>
+              <span className="stat-label">Subscribers</span>
+            </div>
+            <div className="stat">
+              <span className="stat-value">{userVideos.length}</span>
+              <span className="stat-label">Videos</span>
+            </div>
+            <div className="stat">
+              <span className="stat-value">{totalViews}</span>
+              <span className="stat-label">Total Views</span>
+            </div>
+          </div>
+          <div className="profile-join-date">
+            Joined {joinDate ? formatDate(joinDate) : 'Recently'}
+          </div>
+        </div>
+      </div>
+
+      <div className="profile-videos">
+        <h2>Videos</h2>
+        <div className="videos-grid">
+          {userVideos.map(video => <VideoCard key={video.id} video={video} onVideoClick={() => setSelectedVideo(video)} />)}
+        </div>
+      </div>
+
+      {selectedVideo && <VideoFullscreen video={selectedVideo} onClose={() => setSelectedVideo(null)} />}
+    </div>;
+}
+function VideoCard({
+  video,
+  onVideoClick,
+  setVideo,
+  setThumbnail,
+  setThumbnailUrl,
+  setViewingProfile,
+  isSimpleUI
+}) {
+  const [isHovering, setIsHovering] = useState(false);
+  const videoRef = useRef(null);
+  const hoverTimerRef = useRef(null);
+  const [commentCount, setCommentCount] = useState(0);
+  const [isInappropriate, setIsInappropriate] = useState(video.isInappropriate || false);
+  const [showWarning, setShowWarning] = useState(false);
+  const room = new WebsimSocket();
+  useEffect(() => {
+    if (isHovering && videoRef.current) {
+      videoRef.current.currentTime = 0;
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log("Video playback error:", error);
+        });
+      }
+      hoverTimerRef.current = setTimeout(() => {
+        if (videoRef.current) {
+          const pausePromise = videoRef.current.pause();
+          if (pausePromise !== undefined) {
+            pausePromise.catch(error => {
+              console.log("Video pause error:", error);
+            });
+          }
+        }
+      }, 10000);
+    } else if (videoRef.current) {
+      const pausePromise = videoRef.current.pause();
+      if (pausePromise !== undefined) {
+        pausePromise.catch(error => {
+          console.log("Video pause error:", error);
+        });
+      }
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+      }
+    }
+    return () => {
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+      }
+      if (videoRef.current) {
+        const pausePromise = videoRef.current.pause();
+        if (pausePromise !== undefined) {
+          pausePromise.catch(error => {
+            console.log("Video pause error:", error);
+          });
+        }
+      }
+    };
+  }, [isHovering]);
+  useEffect(() => {
+    const unsubscribe = room.collection('comments').filter({
+      videoId: video.id
+    }).subscribe(comments => {
+      const replyUnsubscribe = room.collection('replies').subscribe(replies => {
+        const videoReplies = replies.filter(reply => comments.some(comment => comment.id === reply.parentCommentId));
+        setCommentCount(comments.length + videoReplies.length);
+      });
+      return () => replyUnsubscribe();
+    });
+    return () => unsubscribe();
+  }, [video.id]);
+  const handleVideoChange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      setVideo(file);
+      const videoEl = document.createElement('video');
+      videoEl.src = URL.createObjectURL(file);
+      setVideo(file);
+      videoEl.addEventListener('loadeddata', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoEl.videoWidth;
+        canvas.height = videoEl.videoHeight;
+        videoEl.currentTime = 260 / 30;
+        videoEl.addEventListener('seeked', () => {
+          canvas.getContext('2d').drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(blob => {
+            setThumbnail(blob);
+            setThumbnailUrl(URL.createObjectURL(blob));
+          }, 'image/jpeg', 0.95);
+        });
+      });
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.src = URL.createObjectURL(file);
+        }
+      }, 0);
+    }
+  };
+  const formatDate = dateString => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+  const formatRelativeTime = dateString => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    const diffInMonths = Math.floor(diffInDays / 30);
+    const diffInYears = Math.floor(diffInDays / 365);
+    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+    if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    if (diffInWeeks < 4) return `${diffInWeeks} weeks ago`;
+    if (diffInMonths < 12) return `${diffInMonths} months ago`;
+    return `${diffInYears} years ago`;
+  };
+  return <div className="video-card" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)} onClick={() => onVideoClick(video)}>
+      {isSimpleUI ? <div className="video-info">
+          <div className="video-title">{video.title}</div>
+          <div className="video-stats-icons">
+            <div className="stats-item">
+              <svg viewBox="0 0 24 24">
+                <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41.17-.79.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+              </svg>
+              {video.likes || 0}
+            </div>
+            <div className="stats-item">
+              <svg viewBox="0 0 24 24">
+                <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2L2 18c0 1.1.9 2 2 2h14l4 4-.01-18zM17 11h-4v4h-2v-5H7V9h4V5h2v4h4v2z" />
+              </svg>
+              {commentCount}
+            </div>
+          </div>
+        </div> : <>
+          <div style={{
+        position: 'relative'
+      }}>
+            {isInappropriate && !showWarning && <div className="content-warning">
+                <div>This video may not be suitable for a younger audience.</div>
+                <button onClick={e => {
+            e.stopPropagation();
+            setShowWarning(true);
+          }}>Show Anyway</button>
+            </div>}
+            {isHovering ? video.isSlideshow ? <Slideshow images={video.slideshowImages} /> : <video ref={videoRef} className="video-thumbnail" src={video.videoUrl} muted style={{
+          maxHeight: '100%',
+          maxWidth: '100%'
+        }} onError={e => {
+          console.error('Video preview error:', e);
+          setIsHovering(false);
+        }} /> : <img src={video.thumbnailUrl || `https://images.websim.ai/avatar/${video.username}`} alt={video.title} className="video-thumbnail" />}
+          </div>
+          <div className="video-info">
+            <div className="video-title">{video.title}</div>
+            <div className="video-metadata">
+              <img src={`https://images.websim.ai/avatar/${video.username}`} alt={video.username} style={{
+            width: '24px',
+            height: '24px',
+            borderRadius: '50%',
+            marginRight: '8px'
+          }} />
+              <div className="video-username" onClick={e => {
+            e.stopPropagation();
+            setViewingProfile(video.username);
+          }} style={{
+            cursor: 'pointer'
+          }}>
+                {video.username}
+                {video.username === 'Ai_guy' && <span className="owner-tag">Owner</span>}
+              </div>
+              <span className="video-stats">
+                {video.views || 0} views • {formatRelativeTime(video.created_at)}
+                <div className="video-stats-icons">
+                  <div className="stats-item">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41.17-.79.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+                    </svg>
+                    {video.likes || 0}
+                  </div>
+                  <div className="stats-item">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2L2 18c0 1.1.9 2 2 2h14l4 4-.01-18zM17 11h-4v4h-2v-5H7V9h4V5h2v4h4v2z" />
+                    </svg>
+                    {commentCount}
+                  </div>
+                </div>
+              </span>
+            </div>
+          </div>
+        </>}
+    </div>;
+}
+function CreateVideoModal({
+  onClose
+}) {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [video, setVideo] = useState(null);
+  const [thumbnail, setThumbnail] = useState(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState('');
+  const [hashtags, setHashtags] = useState('');
+  const videoRef = useRef(null);
+  const [images, setImages] = useState([]);
+  const [isSlideshow, setIsSlideshow] = useState(false);
+  const [isInappropriate, setIsInappropriate] = useState(false);
+  const handleVideoChange = async e => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('video/')) {
+        alert('Please select a valid video file');
+        return;
+      }
+      setVideo(file);
+      const videoEl = document.createElement('video');
+      videoEl.src = URL.createObjectURL(file);
+      videoEl.addEventListener('loadeddata', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoEl.videoWidth;
+        canvas.height = videoEl.videoHeight;
+        videoEl.currentTime = 8;
+        videoEl.addEventListener('seeked', () => {
+          canvas.getContext('2d').drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(blob => {
+            setThumbnail(blob);
+            setThumbnailUrl(URL.createObjectURL(blob));
+          }, 'image/jpeg', 0.95);
+        });
+      });
+      videoEl.addEventListener('error', () => {
+        alert('Error loading video. Please try a different format.');
+        setVideo(null);
+      });
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.src = URL.createObjectURL(file);
+        }
+      }, 0);
+    }
+  };
+  const handleImageUpload = async e => {
+    const files = Array.from(e.target.files).slice(0, 10);
+    const uploadedUrls = [];
+    for (const file of files) {
+      try {
+        const url = await websim.upload(file);
+        uploadedUrls.push(url);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    }
+    setImages(uploadedUrls);
+  };
+  const captureThumb = () => {
+    const canvas = document.createElement('canvas');
+    const video = videoRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(blob => {
+      setThumbnail(blob);
+      setThumbnailUrl(URL.createObjectURL(blob));
+    }, 'image/jpeg');
+  };
+  const handleSubmit = async e => {
+    e.preventDefault();
+    if (!title.trim()) {
+      alert('Please enter a title');
+      return;
+    }
+    onClose(true);
+    try {
+      if (isSlideshow) {
+        await room.collection('videos').create({
+          title,
+          description,
+          videoUrl: null,
+          thumbnailUrl: images[0],
+          hashtags: hashtags.split(' ').filter(tag => tag.startsWith('#')).map(tag => tag.toLowerCase()),
+          views: 0,
+          likes: 0,
+          dislikes: 0,
+          username: room.party.client.username,
+          isSlideshow: true,
+          slideshowImages: images,
+          isInappropriate
+        });
+        const now = Date.now();
+        localStorage.setItem('lastPostTimes', JSON.stringify([...JSON.parse(localStorage.getItem('lastPostTimes') || '[]'), now].slice(-VIDEO_POST_LIMIT)));
+      } else {
+        const videoUrl = await websim.upload(video);
+        const thumbnailUrl = thumbnail ? await websim.upload(thumbnail) : '';
+        await room.collection('videos').create({
+          title,
+          description,
+          videoUrl,
+          thumbnailUrl: thumbnailUrl || `https://images.websim.ai/avatar/${room.party.client.username}`,
+          hashtags: hashtags.split(' ').filter(tag => tag.startsWith('#')).map(tag => tag.toLowerCase()),
+          views: 0,
+          likes: 0,
+          dislikes: 0,
+          username: room.party.client.username,
+          isInappropriate
+        });
+        const now = Date.now();
+        localStorage.setItem('lastPostTimes', JSON.stringify([...JSON.parse(localStorage.getItem('lastPostTimes') || '[]'), now].slice(-VIDEO_POST_LIMIT)));
+      }
+    } catch (error) {
+      console.error('Error uploading:', error);
+    }
+    onClose(false);
+  };
+  return <div className="modal">
+      <div className="modal-content">
+        <form className="modal-form" onSubmit={handleSubmit}>
+          <input type="text" placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} />
+          <textarea placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
+          <input type="text" placeholder="Add hashtags (separate with spaces: #gaming #music)" value={hashtags} onChange={e => setHashtags(e.target.value)} />
+          <div style={{
+          display: 'flex',
+          gap: '10px',
+          marginBottom: '20px'
+        }}>
+            <button type="button" onClick={() => setIsSlideshow(false)} style={{
+            opacity: !isSlideshow ? 1 : 0.5
+          }}>
+              Upload Video
+            </button>
+            <button type="button" onClick={() => setIsSlideshow(true)} style={{
+            opacity: isSlideshow ? 1 : 0.5
+          }}>
+              Create Slideshow
+            </button>
+        </div>
+          {isSlideshow ? <>
+              <div className="file-upload-container" onClick={() => document.querySelector('#image-upload-input').click()}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+                <p>Click to upload images (max 10)</p>
+                <input id="image-upload-input" type="file" accept="image/*" multiple onChange={handleImageUpload} style={{
+              display: 'none'
+            }} />
+              </div>
+              {images.length > 0 && <div className="image-upload-grid">
+                  {images.map((url, idx) => <img key={idx} src={url} className="image-upload-preview" alt={`Preview ${idx + 1}`} />)}
+                </div>}
+            </> : <div className="file-upload-container" onClick={() => document.querySelector('#video-upload-input').click()}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+              </svg>
+              <p>Click to upload video file</p>
+              <input id="video-upload-input" type="file" accept="video/*" onChange={handleVideoChange} style={{
+            display: 'none'
+          }} />
+            </div>}
+          {video && !isSlideshow && <>
+              <video ref={videoRef} controls style={{
+            width: '100%',
+            aspectRatio: '16/9',
+            maxHeight: '500px',
+            background: '#000'
+          }} onLoadedData={() => videoRef.current.currentTime = 260 / 30} />
+              <button type="button" onClick={captureThumb}>
+                Capture Thumbnail
+              </button>
+
+              {thumbnailUrl && <img src={thumbnailUrl} alt="Video thumbnail" className="thumbnail-preview" />}
+            </>}
+          <div style={{
+          marginTop: '10px'
+        }}>
+            <label>
+              <input type="checkbox" checked={isInappropriate} onChange={e => setIsInappropriate(e.target.checked)} /> Mark as inappropriate content
+            </label>
+          </div>
+          <div className="modal-buttons">
+            <button type="button" className="cancel-button" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="submit-button">
+              Upload Video
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>;
+}
+function Comment({
+  comment
+}) {
+  const [liked, setLiked] = useState(() => {
+    return localStorage.getItem(`comment-${comment.id}-liked`) === 'true';
+  });
+  const [disliked, setDisliked] = useState(() => {
+    return localStorage.getItem(`comment-${comment.id}-disliked`) === 'true';
+  });
+  const [showDeleteButton, setShowDeleteButton] = useState(false);
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [replies, setReplies] = useState([]);
+  const [showReplies, setShowReplies] = useState(false);
+  useEffect(() => {
+    setShowDeleteButton(comment.username === room.party.client.username || room.party.client.username === 'Ai_guy');
+  }, [comment.username]);
+  useEffect(() => {
+    const unsubscribe = room.collection('replies').filter({
+      parentCommentId: comment.id
+    }).subscribe(newReplies => {
+      setReplies(newReplies);
+    });
+    return () => unsubscribe();
+  }, [comment.id]);
+  const handleCommentLike = async () => {
+    if (disliked) return;
+    if (liked) {
+      await room.collection('comments').update(comment.id, {
+        likes: (comment.likes || 0) - 1
+      });
+      setLiked(false);
+      localStorage.setItem(`comment-${comment.id}-liked`, (!liked).toString());
+    } else {
+      await room.collection('comments').update(comment.id, {
+        likes: (comment.likes || 0) + 1
+      });
+      setLiked(true);
+      localStorage.setItem(`comment-${comment.id}-liked`, (!liked).toString());
+    }
+  };
+  const handleCommentDislike = async () => {
+    if (liked) return;
+    if (disliked) {
+      await room.collection('comments').update(comment.id, {
+        dislikes: (comment.dislikes || 0) - 1
+      });
+      setDisliked(false);
+      localStorage.setItem(`comment-${comment.id}-disliked`, (!disliked).toString());
+    } else {
+      await room.collection('comments').update(comment.id, {
+        dislikes: (comment.dislikes || 0) + 1
+      });
+      setDisliked(true);
+      localStorage.setItem(`comment-${comment.id}-disliked`, (!disliked).toString());
+    }
+  };
+  const handleCommentDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this comment?')) {
+      try {
+        await room.collection('comments').delete(comment.id);
+      } catch (error) {
+        console.error('Error deleting comment:', error);
+      }
+    }
+  };
+  const handleReplySubmit = async e => {
+    e.preventDefault();
+    if (!replyText.trim()) return;
+    try {
+      await room.collection('replies').create({
+        parentCommentId: comment.id,
+        text: replyText,
+        username: room.party.client.username,
+        likes: 0,
+        dislikes: 0
+      });
+      setReplyText('');
+      setShowReplyForm(false);
+    } catch (error) {
+      console.error('Error posting reply:', error);
+    }
+  };
+  const Reply = ({
+    reply
+  }) => {
+    const [replyLiked, setReplyLiked] = useState(() => {
+      return localStorage.getItem(`reply-${reply.id}-liked`) === 'true';
+    });
+    const [replyDisliked, setReplyDisliked] = useState(() => {
+      return localStorage.getItem(`reply-${reply.id}-disliked`) === 'true';
+    });
+    const [showDeleteButton, setShowDeleteButton] = useState(false);
+    useEffect(() => {
+      setShowDeleteButton(reply.username === room.party.client.username || room.party.client.username === 'Ai_guy');
+    }, [reply.username]);
+    const handleReplyLike = async () => {
+      if (replyDisliked) return;
+      if (replyLiked) {
+        await room.collection('replies').update(reply.id, {
+          likes: (reply.likes || 0) - 1
+        });
+        setReplyLiked(false);
+        localStorage.setItem(`reply-${reply.id}-liked`, (!replyLiked).toString());
+      } else {
+        await room.collection('replies').update(reply.id, {
+          likes: (reply.likes || 0) + 1
+        });
+        setReplyLiked(true);
+        localStorage.setItem(`reply-${reply.id}-liked`, (!replyLiked).toString());
+      }
+    };
+    const handleReplyDislike = async () => {
+      if (replyLiked) return;
+      if (replyDisliked) {
+        await room.collection('replies').update(reply.id, {
+          dislikes: (reply.dislikes || 0) - 1
+        });
+        setReplyDisliked(false);
+        localStorage.setItem(`reply-${reply.id}-disliked`, (!replyDisliked).toString());
+      } else {
+        await room.collection('replies').update(reply.id, {
+          dislikes: (reply.dislikes || 0) + 1
+        });
+        setReplyDisliked(true);
+        localStorage.setItem(`reply-${reply.id}-disliked`, (!replyDisliked).toString());
+      }
+    };
+    const handleReplyDelete = async () => {
+      if (window.confirm('Are you sure you want to delete this reply?')) {
+        try {
+          await room.collection('replies').delete(reply.id);
+        } catch (error) {
+          console.error('Error deleting reply:', error);
+        }
+      }
+    };
+    return <div className="reply">
+        <img src={`https://images.websim.ai/avatar/${reply.username}`} alt={reply.username} className="comment-avatar" />
+        <div className="comment-content">
+          <div className="comment-header">
+            <span className="comment-username">
+              {reply.username}
+              {reply.username === 'Ai_guy' && <span className="owner-tag">Owner</span>}
+            </span>
+            <span className="comment-time">{formatRelativeTime(reply.created_at)}</span>
+            {showDeleteButton && <>
+                <button className="delete-comment-button" onClick={handleReplyDelete}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                  </svg>
+                  Delete
+                </button>
+              </>}
+          </div>
+          <div className="comment-text">{reply.text}</div>
+          <div className="comment-actions">
+            <div className="comment-action reply-action" onClick={handleReplyLike} style={{
+            color: replyLiked ? '#4285f4' : 'inherit'
+          }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41.17-.79.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+              </svg>
+              <span>{reply.likes || 0}</span>
+            </div>
+            <div className="comment-action reply-action" onClick={handleReplyDislike} style={{
+            color: replyDisliked ? '#4285f4' : 'inherit'
+          }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.58-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
+              </svg>
+              <span>{reply.dislikes || 0}</span>
+            </div>
+          </div>
+        </div>
+      </div>;
+  };
+  return <div className="comment">
+      <img src={`https://images.websim.ai/avatar/${comment.username}`} alt={comment.username} className="comment-avatar" />
+      <div className="comment-content">
+        <div className="comment-header">
+          <span className="comment-username">
+            {comment.username}
+            {comment.username === 'Ai_guy' && <span className="owner-tag">Owner</span>}
+          </span>
+          <span className="comment-time">{formatRelativeTime(comment.created_at)}</span>
+          {showDeleteButton && <>
+              <button className="delete-comment-button" onClick={handleCommentDelete}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                </svg>
+                Delete
+              </button>
+            </>}
+        </div>
+        <div className="comment-text">{comment.text}</div>
+        <div className="comment-actions">
+          <div className="comment-action" onClick={handleCommentLike} style={{
+          color: liked ? '#4285f4' : 'inherit'
+        }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41.17-.79.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+            </svg>
+            <span>{comment.likes || 0}</span>
+          </div>
+          <div className="comment-action" onClick={handleCommentDislike} style={{
+          color: disliked ? '#4285f4' : 'inherit'
+        }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.58-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
+            </svg>
+            <span>{comment.dislikes || 0}</span>
+          </div>
+          <div className="comment-reply-button" onClick={() => setShowReplyForm(!showReplyForm)}>
+            Reply
+          </div>
+        </div>
+        {replies.length > 0 && <div className="reply-count" onClick={() => setShowReplies(!showReplies)}>
+            {showReplies ? 'Hide' : 'Show'} {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+          </div>}
+        {showReplies && replies.length > 0 && <div className="comment-replies">
+            {replies.map(reply => <Reply key={reply.id} reply={reply} />)}
+          </div>}
+        {showReplyForm && <form className="comment-reply-form" onSubmit={handleReplySubmit}>
+          <img src={`https://images.websim.ai/avatar/${room.party.client.username}`} alt="Your avatar" className="comment-avatar" style={{
+          width: '24px',
+          height: '24px'
+        }} />
+          <input type="text" className="comment-input" placeholder="Add a reply..." value={replyText} onChange={e => setReplyText(e.target.value)} />
+          <button className="comment-submit" type="submit" disabled={!replyText.trim()}>
+            Reply
+          </button>
+        </form>}
+      </div>
+    </div>;
+}
+function YouTubeApp() {
+  const [currentUser, setCurrentUser] = useState(room.party.client);
+  const [showMenu, setShowMenu] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [videos, setVideos] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [userLikes, setUserLikes] = useState({});
+  const [viewingProfile, setViewingProfile] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredVideos, setFilteredVideos] = useState([]);
+  const [showingPlaylists, setShowingPlaylists] = useState(false);
+  const [lastPostTimes, setLastPostTimes] = useState(() => {
+    const saved = localStorage.getItem('lastPostTimes');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSimpleUI, setIsSimpleUI] = useState(false);
+  const [activeSort, setActiveSort] = useState('homepage');
+  const [allSubscriptions, setAllSubscriptions] = useState({});
+  useEffect(() => {
+    setVideos([]);
+    const unsubscribe = room.collection('videos').subscribe(newVideos => {
+      setVideos(newVideos);
+      setFilteredVideos(newVideos);
+    });
+    const likesUnsubscribe = room.collection('userLikes').filter({
+      username: room.party.client.username
+    }).subscribe(likes => {
+      const userLikes = {};
+      likes.forEach(like => {
+        userLikes[like.videoId] = true;
+      });
+      setUserLikes(userLikes);
+    });
+    const subsUnsubscribe = room.collection('subscriptions').filter({
+      subscriber: room.party.client.username
+    }).subscribe(subscriptions => {
+      const userSubs = {};
+      subscriptions.forEach(sub => {
+        userSubs[sub.channel] = true;
+      });
+      setAllSubscriptions(userSubs);
+    });
+    return () => {
+      unsubscribe();
+      likesUnsubscribe();
+      subsUnsubscribe();
+    };
+  }, []);
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    document.body.classList.toggle('light-mode');
+  };
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+  const handleProfileClick = () => {
+    setShowMenu(!showMenu);
+  };
+  const handleProfileView = username => {
+    setViewingProfile(username);
+  };
+  const handleSearch = query => {
+    setSearchQuery(query);
+    const lowercaseQuery = query.toLowerCase().trim();
+    if (!lowercaseQuery) {
+      setFilteredVideos(videos);
+      return;
+    }
+    const filtered = videos.filter(video => {
+      const titleMatch = video.title.toLowerCase().includes(lowercaseQuery);
+      const hashtagMatch = video.hashtags && video.hashtags.some(tag => tag.toLowerCase().includes(lowercaseQuery));
+      return titleMatch || hashtagMatch;
+    });
+    setFilteredVideos(filtered);
+  };
+  const handleHashtagClick = hashtag => {
+    setSearchQuery(hashtag);
+    handleSearch(hashtag);
+  };
+  const canPostVideo = () => {
+    const now = Date.now();
+    const recentPosts = lastPostTimes.filter(time => now - time < VIDEO_POST_COOLDOWN);
+    if (recentPosts.length < VIDEO_POST_LIMIT) {
+      return {
+        canPost: true,
+        timeRemaining: 0
+      };
+    }
+    const oldestPost = Math.min(...recentPosts);
+    const timeRemaining = Math.ceil((VIDEO_POST_COOLDOWN - (now - oldestPost)) / 60000);
+    return {
+      canPost: false,
+      timeRemaining
+    };
+  };
+  const getSortedVideos = () => {
+    switch (activeSort) {
+      case 'trending':
+        const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        return filteredVideos.filter(v => new Date(v.created_at) > last24h).sort((a, b) => (b.likes || 0) - (a.likes || 0));
+      case 'mostLiked':
+        return [...filteredVideos].sort((a, b) => (b.likes || 0) - (a.likes || 0));
+      case 'mostViewed':
+        return [...filteredVideos].sort((a, b) => (b.views || 0) - (a.views || 0));
+      case 'subscriptions':
+        return filteredVideos.filter(v => allSubscriptions[v.username]);
+      case 'events':
+        return [];
+      default:
+        return filteredVideos;
+    }
+  };
+  return <div className={isFullscreen ? 'fullscreen-mode' : ''}>
+      <div className="discord-banner">
+        Join our Discord to keep up and suggest new features! <a href="https://discord.gg/ZxxYAmCU" target="_blank">Join Now</a>
+      </div>
+      {viewingProfile ? <ProfilePage username={viewingProfile} onClose={() => setViewingProfile(null)} /> : showingPlaylists ? <PlaylistsView username={room.party.client.username} onClose={() => setShowingPlaylists(false)} /> : <>
+          <header className="header">
+            <div className="logo">
+              <svg height="24" viewBox="0 0 24 24" width="24">
+                <defs>
+                  <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#4285f4" />
+                    <stop offset="100%" stopColor="#ea4335" />
+                  </linearGradient>
+                </defs>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+              </svg>
+              WebTube
+            </div>
+            <div className="search-bar">
+              <input type="text" placeholder="Search" value={searchQuery} onChange={e => handleSearch(e.target.value)} />
+              <button onClick={() => handleSearch(searchQuery)}>🔍</button>
+            </div>
+            <button className="create-button" onClick={() => {
+          const postStatus = canPostVideo();
+          if (postStatus.canPost) {
+            setShowCreateModal(true);
+          } else {
+            alert(`You have hit your limit. You can post again in ${postStatus.timeRemaining} minutes`);
+          }
+        }}>
+              <svg viewBox="0 0 24 24">
+                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z" />
+              </svg>
+              Create
+            </button>
+            {isUploading && <div className="upload-progress" />}
+            <div className="profile-menu">
+              <button className="profile-button" onClick={handleProfileClick}>
+                <img src={`https://images.websim.ai/avatar/${room.party.client.username}`} alt="Profile" />
+              </button>
+              {showMenu && <div className="profile-menu-dropdown">
+                  <div className="menu-item" onClick={() => handleProfileView(room.party.client.username)}>
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                    </svg>
+                    View Profile
+                  </div>
+                  <div className="menu-item" onClick={() => setShowingPlaylists(true)}>
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M15 6H3H0v2h12v2h2V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z" />
+                    </svg>
+                    My Playlists
+                  </div>
+                  <div className="menu-item" onClick={toggleTheme}>
+                    <svg viewBox="0 0 24 24">
+                      {isDarkMode ? <path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zm-2 5.79V18h-3.52L12 20.48 9.52 18H6v-3.52L3.52 12 6 9.52V6h3.52L12 3.52 14.48 6H18v3.52L20.48 12 18 14.48z" /> : <path d="M12 5.69l5 4.5V18h-2v-6H9v6H7v-7.81l5-4.5M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" />}
+                    </svg>
+                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                  </div>
+                  <div className="menu-item" onClick={toggleFullscreen}>
+                    <svg viewBox="0 0 24 24">
+                      {isFullscreen ? <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z" /> : <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />}
+                    </svg>
+                    {isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+                  </div>
+                  <div className="menu-item" onClick={() => setIsSimpleUI(!isSimpleUI)}>
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                    </svg>
+                    {isSimpleUI ? 'Default UI' : 'Simple UI'}
+                  </div>
+                </div>}
+            </div>
+          </header>
+
+          <div className="sidebar">
+            <button className={`sorting-button ${activeSort === 'homepage' ? 'active' : ''}`} onClick={() => setActiveSort('homepage')}>
+              <svg viewBox="0 0 24 24">
+                <path d="M12 5.69l5 4.5V18h-2v-6H9v6H7v-7.81l5-4.5M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" />
+              </svg>
+              Homepage
+            </button>
+            
+            <button className={`sorting-button ${activeSort === 'trending' ? 'active' : ''}`} onClick={() => setActiveSort('trending')}>
+              <svg viewBox="0 0 24 24">
+                <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z" />
+              </svg>
+              Trending
+            </button>
+
+            <button className={`sorting-button ${activeSort === 'mostLiked' ? 'active' : ''}`} onClick={() => setActiveSort('mostLiked')}>
+              <svg viewBox="0 0 24 24">
+                <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41.17-.79.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+              </svg>
+              Most Liked
+            </button>
+
+            <button className={`sorting-button ${activeSort === 'mostViewed' ? 'active' : ''}`} onClick={() => setActiveSort('mostViewed')}>
+              <svg viewBox="0 0 24 24">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+              </svg>
+              Most Viewed
+            </button>
+
+            <button className={`sorting-button ${activeSort === 'subscriptions' ? 'active' : ''}`} onClick={() => setActiveSort('subscriptions')}>
+              <svg viewBox="0 0 24 24">
+                <path d="M20 8H4V6h16v2zm-2-6H6v2h12V2zm4 10v8c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2zm-6 4l-6-3.27v6.53L16 16z" />
+              </svg>
+              Subscriptions
+            </button>
+
+            <button className={`sorting-button ${activeSort === 'events' ? 'active' : ''}`} onClick={() => setActiveSort('events')}>
+              <svg viewBox="0 0 24 24">
+                <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM14 5v2h3v3h2V5h-5z" />
+              </svg>
+              Events
+            </button>
+            <button className={`sorting-button ${activeSort === 'globalChat' ? 'active' : ''}`} onClick={() => setActiveSort('globalChat')}>
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
+              </svg>
+              Global Chat
+            </button>
+          </div>
+
+          <div className="container">
+            {activeSort === 'subscriptions' && Object.keys(allSubscriptions).length === 0 ? <div className="no-subscriptions">
+                You are not subscribed to anybody...
+              </div> : activeSort === 'events' ? <div className="no-events">
+                There is no event yet. Come back later when an event is happening.
+              </div> : activeSort === 'globalChat' ? <GlobalChat /> : <div className="videos-grid">
+                {getSortedVideos().map(video => <VideoCard key={video.id} video={video} onVideoClick={setSelectedVideo} setViewingProfile={setViewingProfile} isSimpleUI={isSimpleUI} />)}
+              </div>}
+          </div>
+
+          {showCreateModal && <CreateVideoModal onClose={uploading => {
+        setIsUploading(uploading);
+        setShowCreateModal(false);
+      }} />}
+          {selectedVideo && <VideoFullscreen video={selectedVideo} onClose={() => setSelectedVideo(null)} setSelectedVideo={setSelectedVideo} setViewingProfile={setViewingProfile} handleHashtagClick={handleHashtagClick} />}
+        </>}
+    </div>;
+}
+function EditVideoModal({
+  video,
+  onClose
+}) {
+  const [title, setTitle] = useState(video.title);
+  const [description, setDescription] = useState(video.description || '');
+  const [hashtags, setHashtags] = useState(video.hashtags ? video.hashtags.join(' ') : '');
+  const [thumbnail, setThumbnail] = useState(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState(video.thumbnailUrl);
+  const [isInappropriate, setIsInappropriate] = useState(video.isInappropriate || false);
+  const videoRef = useRef(null);
+  const captureThumb = () => {
+    const canvas = document.createElement('canvas');
+    const video = videoRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(blob => {
+      setThumbnail(blob);
+      setThumbnailUrl(URL.createObjectURL(blob));
+    }, 'image/jpeg');
+  };
+  const handleSubmit = async e => {
+    e.preventDefault();
+    try {
+      let newThumbnailUrl = video.thumbnailUrl || `https://images.websim.ai/avatar/${room.party.client.username}`;
+      if (thumbnail) {
+        newThumbnailUrl = await websim.upload(thumbnail);
+      }
+      await room.collection('videos').update(video.id, {
+        title,
+        description,
+        thumbnailUrl: newThumbnailUrl,
+        hashtags: hashtags.split(' ').filter(tag => tag.startsWith('#')).map(tag => tag.toLowerCase()),
+        isInappropriate
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error updating video:', error);
+    }
+  };
+  return <div className="modal">
+      <div className="modal-content">
+        <form className="modal-form" onSubmit={handleSubmit}>
+          <input type="text" placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} />
+          <textarea placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
+          <input type="text" placeholder="Add hashtags (separate with spaces: #gaming #music)" value={hashtags} onChange={e => setHashtags(e.target.value)} />
+          <video ref={videoRef} controls style={{
+          width: '100%',
+          aspectRatio: '16/9',
+          maxHeight: '500px',
+          background: '#000'
+        }} src={video.videoUrl} />
+          <button type="button" onClick={captureThumb}>
+            Capture New Thumbnail
+          </button>
+          {thumbnailUrl && <img src={thumbnailUrl} alt="Video thumbnail" className="thumbnail-preview" />}
+          <div style={{
+          marginTop: '10px'
+        }}>
+            <label>
+              <input type="checkbox" checked={isInappropriate} onChange={e => setIsInappropriate(e.target.checked)} /> Mark as inappropriate content
+            </label>
+          </div>
+          <div className="modal-buttons">
+            <button type="button" className="cancel-button" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="submit-button">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>;
+}
+function AddToPlaylistModal({
+  video,
+  onClose
+}) {
+  const [playlists, setPlaylists] = useState([]);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
+  useEffect(() => {
+    const unsubscribe = room.collection('playlists').filter({
+      username: room.party.client.username
+    }).subscribe(playlists => {
+      setPlaylists(playlists);
+    });
+    return () => unsubscribe();
+  }, []);
+  const createNewPlaylist = async e => {
+    e.preventDefault();
+    if (!newPlaylistName.trim()) return;
+    try {
+      const playlist = await room.collection('playlists').create({
+        name: newPlaylistName,
+        username: room.party.client.username,
+        videos: [video.id]
+      });
+      setNewPlaylistName('');
+      onClose();
+    } catch (error) {
+      console.error('Error creating playlist:', error);
+    }
+  };
+  const addToPlaylist = async playlist => {
+    try {
+      const updatedVideos = [...playlist.videos, video.id];
+      await room.collection('playlists').update(playlist.id, {
+        videos: updatedVideos
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error updating playlist:', error);
+    }
+  };
+  return <div className="playlist-modal" onClick={onClose}>
+      <div className="playlist-modal-content" onClick={e => e.stopPropagation()}>
+        <h3>Add to playlist</h3>
+        <div className="playlist-list">
+          {playlists.map(playlist => <div key={playlist.id} className="playlist-item" onClick={() => addToPlaylist(playlist)}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15 6H3H0v2h12v2h2V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z" />
+              </svg>
+              {playlist.name}
+            </div>)}
+        </div>
+        <form className="new-playlist-form" onSubmit={createNewPlaylist}>
+          <input type="text" placeholder="New playlist name" value={newPlaylistName} onChange={e => setNewPlaylistName(e.target.value)} />
+          <button className="submit-button" type="submit">Create</button>
+        </form>
+      </div>
+    </div>;
+}
+function PlaylistsView({
+  username,
+  onClose
+}) {
+  const [playlists, setPlaylists] = useState([]);
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [playlistVideos, setPlaylistVideos] = useState([]);
+  useEffect(() => {
+    const unsubscribe = room.collection('playlists').filter({
+      username
+    }).subscribe(playlists => {
+      setPlaylists(playlists);
+    });
+    return () => unsubscribe();
+  }, [username]);
+  useEffect(() => {
+    if (selectedPlaylist) {
+      const unsubscribe = room.collection('videos').subscribe(allVideos => {
+        const filteredVideos = allVideos.filter(video => selectedPlaylist.videos.includes(video.id));
+        setPlaylistVideos(filteredVideos);
+      });
+      return () => unsubscribe();
+    }
+  }, [selectedPlaylist]);
+  const handleDeletePlaylist = async (e, playlistId) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this playlist?')) {
+      try {
+        await room.collection('playlists').delete(playlistId);
+      } catch (error) {
+        console.error('Error deleting playlist:', error);
+      }
+    }
+  };
+  if (selectedPlaylist) {
+    return <div className="profile-page">
+      <div className="discord-banner">
+        Join our Discord to keep up and suggest new features! <a href="https://discord.gg/ZxxYAmCU" target="_blank">Join Now</a>
+      </div>
+      <button className="playlist-back-button" onClick={() => setSelectedPlaylist(null)}>
+        Back to Playlists
+      </button>
+      <h2>{selectedPlaylist.name}</h2>
+      <div className="videos-grid">
+        {playlistVideos.map(video => <VideoCard key={video.id} video={{
+          ...video,
+          thumbnailUrl: video.thumbnailUrl || `https://images.websim.ai/avatar/${video.username}`
+        }} onVideoClick={() => {}} />)}
+      </div>
+    </div>;
+  }
+  return <div className="profile-page">
+    <div className="discord-banner">
+      Join our Discord to keep up and suggest new features! <a href="https://discord.gg/ZxxYAmCU" target="_blank">Join Now</a>
+    </div>
+    <button className="playlist-back-button" onClick={onClose}>
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+      </svg>
+      Back
+    </button>
+    <h2>My Playlists</h2>
+    <div className="playlist-list">
+      {playlists.map(playlist => <div key={playlist.id} className="playlist-item" onClick={() => setSelectedPlaylist(playlist)}>
+          <div className="playlist-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15 6H3H0v2h12v2h2V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z" />
+            </svg>
+            {playlist.name}
+          </div>
+          <button className="playlist-delete-button" onClick={e => handleDeletePlaylist(e, playlist.id)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+            </svg>
+            Delete
+          </button>
+        </div>)}
+    </div>
+  </div>;
+}
+function Slideshow({
+  images,
+  onSlideChange
+}) {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  useEffect(() => {
+    setCurrentSlide(0);
+  }, [images]);
+  const nextSlide = () => {
+    setCurrentSlide(prev => {
+      const next = (prev + 1) % images.length;
+      if (onSlideChange) onSlideChange(next);
+      return next;
+    });
+  };
+  const prevSlide = () => {
+    setCurrentSlide(prev => {
+      const next = (prev - 1 + images.length) % images.length;
+      if (onSlideChange) onSlideChange(next);
+      return next;
+    });
+  };
+  const goToSlide = index => {
+    setCurrentSlide(index);
+    if (onSlideChange) onSlideChange(index);
+  };
+  if (!images || images.length === 0) {
+    return null;
+  }
+  return <div className="slideshow-container">
+      <img src={images[currentSlide]} alt={`Slide ${currentSlide + 1}`} className="slideshow-image" />
+      
+      <button className="slideshow-arrow prev" onClick={prevSlide}>
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+        </svg>
+      </button>
+      
+      <button className="slideshow-arrow next" onClick={nextSlide}>
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+        </svg>
+      </button>
+
+      <div className="slideshow-nav">
+        {images.map((_, idx) => <div key={idx} className={`slideshow-dot ${idx === currentSlide ? 'active' : ''}`} onClick={() => goToSlide(idx)} />)}
+      </div>
+    </div>;
+}
+function ChatMessage({
+  message,
+  onDelete,
+  onEdit,
+  setViewingProfile,
+  setSelectedDM,
+  setActiveChannel
+}) {
+  const [showDeleteButton, setShowDeleteButton] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(message.text);
+  useEffect(() => {
+    setShowDeleteButton(message.username === room.party.client.username || room.party.client.username === 'Ai_guy');
+  }, [message.username]);
+  const handleEdit = async () => {
+    if (!editText.trim()) return;
+    await onEdit(message.id, editText);
+    setIsEditing(false);
+  };
+  return <div className="chat-message">
+      <img src={`https://images.websim.ai/avatar/${message.username}`} alt={message.username} />
+      <div className="message-content">
+        <div className="message-header">
+          <span className="message-username" onClick={() => setViewingProfile(message.username)}>
+            {message.username}
+            {message.username === 'Ai_guy' && <span className="owner-tag">Owner</span>}
+          </span>
+          {message.username !== room.party.client.username && <button className="envelope-icon" onClick={() => {
+          setActiveChannel('dm');
+          setSelectedDM(message.username);
+        }}>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+              </svg>
+            </button>}
+          <span className="message-time">{formatRelativeTime(message.created_at)}</span>
+          {showDeleteButton && <>
+              <button className="delete-comment-button" onClick={() => onDelete(message.id)}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                </svg>
+                Delete
+              </button>
+              <button className="delete-comment-button edit-button" onClick={() => setIsEditing(!isEditing)}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                </svg>
+                Edit
+              </button>
+            </>}
+        </div>
+        {isEditing ? <div className="message-edit">
+            <input type="text" value={editText} onChange={e => setEditText(e.target.value)} onKeyPress={e => e.key === 'Enter' && handleEdit()} />
+            <button onClick={handleEdit}>Save</button>
+          </div> : <>
+            <div className="message-text">{message.text}</div>
+            {message.imageUrl && <img src={message.imageUrl} alt="Chat attachment" className="chat-image" style={{
+          width: '300px',
+          height: '300px',
+          objectFit: 'cover',
+          borderRadius: '12px'
+        }} />}
+          </>}
+      </div>
+    </div>;
+}
+function GlobalChat({
+  viewingProfile,
+  setViewingProfile
+}) {
+  const [messages, setMessages] = useState([]);
+  const [messageText, setMessageText] = useState('');
+  const messagesEndRef = useRef(null);
+  const [activeChannel, setActiveChannel] = useState('main');
+  const [viewingProfileState, setViewingProfileState] = useState(null);
+  const [selectedDM, setSelectedDM] = useState(null);
+  const [directMessages, setDirectMessages] = useState([]);
+  const [lastMessage, setLastMessage] = useState('');
+  const [lastDMTime, setLastDMTime] = useState(0);
+  const [lastMessageTime, setLastMessageTime] = useState(0);
+  const [imageUrl, setImageUrl] = useState('');
+  const handleImageUpload = url => {
+    setImageUrl(url);
+  };
+  useEffect(() => {
+    if (selectedDM) {
+      const dmChannel = [room.party.client.username, selectedDM].sort().join('-');
+      const unsubscribe = room.collection('direct_messages').filter({
+        channel: dmChannel
+      }).subscribe(messages => {
+        setDirectMessages(messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+      });
+      return () => unsubscribe();
+    }
+  }, [selectedDM]);
+  useEffect(() => {
+    const unsubscribe = room.collection('chat_messages').filter({
+      channel: activeChannel
+    }).subscribe(newMessages => {
+      setMessages(newMessages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+    });
+    return () => unsubscribe();
+  }, [activeChannel]);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: 'smooth'
+    });
+  }, [messages, directMessages]);
+  const handleSubmit = async e => {
+    e.preventDefault();
+    if (!messageText.trim() && !imageUrl) return;
+    if (messageText.length > 250) {
+      alert('Message cannot exceed 250 characters');
+      return;
+    }
+    if (messageText === lastMessage) {
+      alert('Cannot send the same message twice in a row');
+      return;
+    }
+    try {
+      const now = Date.now();
+      if (activeChannel === 'dm' && selectedDM) {
+        if (now - lastDMTime < 3000) {
+          alert('Please wait 3 seconds between DM messages');
+          return;
+        }
+        const dmChannel = [room.party.client.username, selectedDM].sort().join('-');
+        room.collection('direct_messages').create({
+          text: messageText,
+          imageUrl: imageUrl,
+          username: room.party.client.username,
+          channel: dmChannel,
+          recipient: selectedDM
+        });
+        setLastDMTime(now);
+      } else {
+        if (now - lastMessageTime < 10000) {
+          alert('Please wait 10 seconds between messages');
+          return;
+        }
+        room.collection('chat_messages').create({
+          text: messageText,
+          imageUrl: imageUrl,
+          username: room.party.client.username,
+          channel: activeChannel
+        });
+        setLastMessageTime(now);
+      }
+      setLastMessage(messageText);
+      setMessageText('');
+      setImageUrl('');
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+  const handleDelete = async messageId => {
+    try {
+      if (activeChannel === 'dm' && selectedDM) {
+        await room.collection('direct_messages').delete(messageId);
+      } else {
+        await room.collection('chat_messages').delete(messageId);
+      }
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
+  };
+  const handleEdit = async (messageId, newText) => {
+    try {
+      if (activeChannel === 'dm' && selectedDM) {
+        await room.collection('direct_messages').update(messageId, {
+          text: newText
+        });
+      } else {
+        await room.collection('chat_messages').update(messageId, {
+          text: newText
+        });
+      }
+    } catch (error) {
+      console.error('Error editing message:', error);
+    }
+  };
+  if (viewingProfileState) {
+    return <ProfilePage username={viewingProfileState} onClose={() => setViewingProfileState(null)} />;
+  }
+  return <div className="chat-container">
+      <div className="chat-menu">
+        <button className={`chat-menu-button ${activeChannel === 'main' ? 'active' : ''}`} onClick={() => {
+        setActiveChannel('main');
+        setSelectedDM(null);
+      }}>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+          </svg>
+          Main Chat
+        </button>
+        <button className={`chat-menu-button ${activeChannel === 'features' ? 'active' : ''}`} onClick={() => {
+        setActiveChannel('features');
+        setSelectedDM(null);
+      }}>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+          </svg>
+          Feature Requests
+        </button>
+        <button className={`chat-menu-button ${activeChannel === 'dm' ? 'active' : ''}`} onClick={() => {
+        setActiveChannel('dm');
+        setSelectedDM(null);
+      }}>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z" />
+          </svg>
+          Direct Messages
+        </button>
+      </div>
+      <div className="chat-messages">
+        {activeChannel === 'dm' ? selectedDM ? <>
+            {directMessages.map(message => <ChatMessage key={message.id} message={message} onDelete={handleDelete} onEdit={handleEdit} setViewingProfile={setViewingProfileState} setSelectedDM={setSelectedDM} setActiveChannel={setActiveChannel} />)}
+            <div ref={messagesEndRef} />
+          </> : <DirectMessageList onSelectUser={setSelectedDM} /> : <>
+            {messages.map(message => <ChatMessage key={message.id} message={message} onDelete={handleDelete} onEdit={handleEdit} setViewingProfile={setViewingProfileState} setSelectedDM={setSelectedDM} setActiveChannel={setActiveChannel} />)}
+            <div ref={messagesEndRef} />
+          </>}
+      </div>
+      {activeChannel !== 'dm' || selectedDM ? <div className="chat-input-container">
+          <ChatImageUpload onUpload={handleImageUpload} />
+          <button className="image-upload-button" onClick={() => document.getElementById('chat-image-upload').click()}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+            </svg>
+          </button>
+          <form onSubmit={handleSubmit} style={{
+        flex: 1,
+        display: 'flex',
+        gap: '10px',
+        position: 'relative'
+      }}>
+            <input type="text" placeholder={selectedDM ? `Message ${selectedDM}...` : "Type a message..."} value={messageText} onChange={e => {
+          if (e.target.value.length <= 250) {
+            setMessageText(e.target.value);
+          }
+        }} maxLength={250} style={{
+          flex: 1
+        }} />
+            {messageText.length > 0 && <span style={{
+          position: 'absolute',
+          right: '80px',
+          bottom: '12px',
+          fontSize: '12px',
+          color: messageText.length > 200 ? '#ea4335' : '#aaa'
+        }}>
+                {messageText.length}/250
+              </span>}
+            <button type="submit">Send</button>
+          </form>
+        </div> : null}
+    </div>;
+}
+function DirectMessageList({
+  onSelectUser
+}) {
+  const [users, setUsers] = useState([]);
+  const [dmHistory, setDmHistory] = useState([]);
+  useEffect(() => {
+    const unsubscribe = room.party.subscribe(peers => {
+      const peerList = Object.values(peers).filter(peer => peer.username !== room.party.client.username).map(peer => ({
+        username: peer.username,
+        avatarUrl: peer.avatarUrl
+      }));
+      setUsers(peerList);
+    });
+    return () => unsubscribe();
+  }, []);
+  useEffect(() => {
+    const unsubscribe = room.collection('direct_messages').subscribe(messages => {
+      const history = messages.filter(msg => msg.username === room.party.client.username || msg.recipient === room.party.client.username).reduce((acc, msg) => {
+        const otherUser = msg.username === room.party.client.username ? msg.recipient : msg.username;
+        if (!acc.includes(otherUser)) {
+          acc.push(otherUser);
+        }
+        return acc;
+      }, []);
+      setDmHistory(history);
+    });
+    return () => unsubscribe();
+  }, []);
+  const allUsers = [...new Set([...users.map(u => u.username), ...dmHistory])];
+  return <div className="dm-list">
+      {allUsers.map(username => <div key={username} className="dm-user" onClick={() => onSelectUser(username)}>
+          <img src={`https://images.websim.ai/avatar/${username}`} alt={username} className="dm-avatar" />
+          <span className="dm-username">{username}</span>
+        </div>)}
+      {allUsers.length === 0 && <div className="no-users">
+          No direct messages yet
+        </div>}
+    </div>;
+}
+function ChatImageUpload({
+  onUpload
+}) {
+  const handleImageUpload = async e => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        const url = await websim.upload(file);
+        onUpload(url);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Failed to upload image');
+      }
+    }
+  };
+  return <input type="file" accept="image/*" onChange={handleImageUpload} style={{
+    display: 'none'
+  }} id="chat-image-upload" />;
+}
+ReactDOM.render(<YouTubeApp />, document.getElementById('root'));</script>
+</body>
+</html>
