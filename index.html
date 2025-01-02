@@ -46,11 +46,12 @@
             const capituloSelect = document.getElementById('capitulo');
             const versiculoSelect = document.getElementById('versiculo');
             const resultadoDiv = document.getElementById('resultado');
+            const API_URL = 'http://194.164.125.5:6062/buscar';
 
             // Función para realizar solicitudes POST
             const realizarSolicitud = async (datos) => {
                 try {
-                    const respuesta = await fetch('http://194.164.125.5:6062/buscar', {
+                    const respuesta = await fetch(API_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(datos)
@@ -61,7 +62,7 @@
                 }
             };
 
-            // Cargar libros
+            // Cargar libros al iniciar
             realizarSolicitud({ libro: '', capitulo: '', versiculo: '' })
                 .then(data => {
                     if (data.libros) {
